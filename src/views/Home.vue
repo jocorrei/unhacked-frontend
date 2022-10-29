@@ -203,7 +203,7 @@
                       class="cardElements"
                       style="background-color: #c6c4c4"
                       @click="settleBounty(selectedBounty)"
-                      >Settle</v-btn
+                      >{{ spendCondition ? "Settle" : "Approve" }}</v-btn
                     >
                   </v-col>
                 </v-row>
@@ -280,7 +280,7 @@
 <script>
   import connect from "../composables/connect/index";
   import ERC20ABI from "@/abi/ERC20abi.json";
-  import UNHACKEDABI from "@/abi/unhackedInsurance.json";
+  import UNHACKEDABI from "@/abi/UnhackedInsurance.json";
   import Web3 from "web3";
   export default {
     name: "HomeView",
@@ -441,32 +441,6 @@
           .then(() => {
             this.proposalLoading = false;
           });
-
-      },
-      async settleBounty() {
-        let bounty = this.selectedBounty;
-
-        console.log("bounty object", bounty);
-        let provider = window.ethereum;
-        if (typeof provider !== "undefined") {
-          //Metamask is installed
-          provider
-            .request({ method: "eth_requestAccounts" })
-            .then((accounts) => {
-              console.log(accounts);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-
-        const web3 = new Web3(provider);
-        const networkId = await web3.eth.net.getId();
-        console.log("testing ID", networkId);
-      },
-      openDialog(bounty) {
-        this.selectedBounty = bounty;
-        this.dialog = true;
       },
       openProposalDialog() {
         this.proposalDialog = true;
@@ -485,7 +459,49 @@
               console.log(err);
             });
         }
-        console.log("testing provider", provider);
+      },
+      async settleBounty(bounty) {
+
+        console.log("bounty object", bounty);
+        let provider = window.ethereum;
+        if (typeof provider !== "undefined") {
+          //Metamask is installed
+          provider
+            .request({ method: "eth_requestAccounts" })
+            .then((accounts) => {
+              console.log(accounts);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+
+        let web3 = new Web3(window.ethereum);
+
+        let erc20Address = bounty.contractAddress;
+        let erc20 = new web3.eth.Contract(this.ERC20, erc20Address);
+        let unHacked = new web3.eth.Contract(
+          this.UnhackedInsurance,
+          this.unHackedAddress
+        );
+
+        if (this.spendCondition == false) {
+          erc20.methods
+            .approve(this.unHackedAddress, bounty.bountyAmount)
+            .send({ from: this.selectedAccount })
+            .then(() => {
+              this.spendCondition = true;
+            });
+        }
+        else {
+          unHacked.methods
+            .acceptBountyRequest(bounty.id, bounty.proposals[0].id)
+            .send({ from: this.selectedAccount });
+        }
+      },
+      openDialog(bounty) {
+        this.selectedBounty = bounty;
+        this.dialog = true;
       },
     },
   };
