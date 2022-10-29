@@ -210,6 +210,10 @@
 
 <script>
   import connect from "../composables/connect/index";
+  import Web3 from 'web3';
+  import ERC20ABI from "@/abi/ERC20.json"
+  import UNHACKEDINSURANCEABI from "@/abi/UnhackedInsurance.json"
+
   export default {
     name: "HomeView",
     setup: () => {
@@ -227,6 +231,8 @@
       };
     },
     data: () => ({
+      ERC20: JSON.parse(JSON.stringify(ERC20ABI.abi)),
+      UnhackedInsurance: JSON.parse(JSON.stringify(UNHACKEDINSURANCEABI.abi)),
       dialog: false,
       selectedBounty: {},
       selectedAccount: "",
@@ -235,7 +241,8 @@
           date: "25/10/22",
           protocol: "Ape Factory DeFi",
           bounty: "100 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          bountyAmount: 100,
+          contractAddress: "0x25784622b54C7Ca85073FB1eFd89402F7bcB3B4D",
           creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
           id: 1,
           legalTerms:
@@ -330,8 +337,8 @@
       ],
     }),
     methods: {
-      settleBounty() {
-        let bounty = this.selectedBounty
+      settleBounty(bounty) {
+        //let bounty = this.selectedBounty
 
         console.log("bounty object", bounty);
         let provider = window.ethereum;
@@ -347,6 +354,18 @@
             });
         }
         console.log("testing provider", provider);
+
+		let web3 = new Web3(window.ethereum);
+
+		let erc20Address = bounty.contractAddress;
+		let erc20 = new web3.eth.Contract(this.ERC20, erc20Address);
+
+		// let unHackedAddress = '0xB7fD3d13910a16961F1cef2E1CFD55402cf68A01';
+		// let unHacked = new web3.eth.Contract(this.UnhackedInsurance, unHackedAddress);
+		//unHacked.methods.acceptBountyRequest(bounty.id, bounty.proposals.id).call();
+
+		erc20.methods.approve('0xB7fD3d13910a16961F1cef2E1CFD55402cf68A01', bounty.bountyAmount).call().then(result => console.log("check", result));
+
       },
       openDialog(bounty) {
         this.selectedBounty = bounty;
