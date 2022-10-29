@@ -159,8 +159,12 @@
             <v-row class="justify-center ml-8">
               <v-col class="pt-0">
                 <p class="description">
-                  It's reponsability of the proposal creator to verify the
-                  address before settle the agreement
+                  Bounty proposals can receive multiple applications. It is the
+                  protocol’s duty to do its research and accept which bounty is
+                  legitimate. In the unlikely event that you accept a wrongful
+                  bounty, you are receiving and sending money with actors not
+                  involved in the hack. In this case, the origin of the funds
+                  cannot be guaranteed.
                 </p>
               </v-col>
             </v-row>
@@ -278,275 +282,273 @@
 </template>
 
 <script>
-  import ERC20ABI from "@/abi/ERC20abi.json";
-  import UNHACKEDABI from "@/abi/UnhackedInsurance.json";
-  import Web3 from "web3";
-  export default {
-    name: "HomeView",
-    data: () => ({
-      unhackedContract: UNHACKEDABI,
-      erc20Contract: ERC20ABI,
-      proposalLoading: false,
-      proposalDialog: false,
-      dialog: false,
-      selectedBounty: {},
-      refundAddress: "",
-      refundAmount: "",
-      refundToken: "",
-      legalDescription: "",
-      selectedAccount: "",
-      unHackedAddress: "0xd7c9fb30a9719a37db1b4a2981b8d562d8fbe55b",
-      openBounties: [
-        {
-          date: "25/10/22",
-          protocol: "Ape Factory DeFi",
-          bounty: "100 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          id: 1,
-          legalTerms:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
-          proposals: [
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 1,
-            },
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WBTC",
-              amount: 2,
-              id: 2,
-            },
-          ],
-        },
-        {
-          date: "29/10/22",
-          protocol: "Cow DEX",
-          bounty: "25 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          id: 2,
-          legalTerms:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
-          proposals: [
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 1,
-            },
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WBTC",
-              amount: 2,
-              id: 2,
-            },
-          ],
-        },
-        {
-          date: "02/10/22",
-          protocol: "Cow DEX",
-          bounty: "10 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          id: 3,
-          legalTerms:
-            "Lorem <br/> ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
-          proposals: [
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 1,
-            },
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 2,
-            },
-          ],
-        },
-        {
-          date: "02/10/22",
-          protocol: "Sushi DAO",
-          bounty: "30 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          id: 4,
-          legalTerms:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
-          proposals: [
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 1,
-            },
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WBTC",
-              amount: 2,
-              id: 2,
-            },
-          ],
-        },
-      ],
-    }),
-    methods: {
-      async createProposal() {
-        this.proposalLoading = true;
-        let provider = this.connectWallet();
-        const web3 = new Web3(provider);
-        const unhacked = new web3.eth.Contract(
-          this.unhackedContract.abi,
-          this.unHackedAddress
-        );
-        unhacked.methods
-          .createBounty(
-            this.refundAmount,
-            this.refundToken,
-            this.refundAddress,
-            this.legalDescription
-          )
+import ERC20ABI from "@/abi/ERC20abi.json";
+import UNHACKEDABI from "@/abi/UnhackedInsurance.json";
+import Web3 from "web3";
+export default {
+  name: "HomeView",
+  data: () => ({
+    unhackedContract: UNHACKEDABI,
+    erc20Contract: ERC20ABI,
+    proposalLoading: false,
+    proposalDialog: false,
+    dialog: false,
+    selectedBounty: {},
+    refundAddress: "",
+    refundAmount: "",
+    refundToken: "",
+    legalDescription: "",
+    selectedAccount: "",
+    unHackedAddress: "0xd7c9fb30a9719a37db1b4a2981b8d562d8fbe55b",
+    openBounties: [
+      {
+        date: "25/10/22",
+        protocol: "Ape Factory DeFi",
+        bounty: "100 ETH",
+        contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        id: 1,
+        legalTerms:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
+        proposals: [
+          {
+            address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+            symbol: "WETH",
+            amount: 33,
+            id: 1,
+          },
+          {
+            address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+            symbol: "WBTC",
+            amount: 2,
+            id: 2,
+          },
+        ],
+      },
+      {
+        date: "29/10/22",
+        protocol: "Cow DEX",
+        bounty: "25 ETH",
+        contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        id: 2,
+        legalTerms:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
+        proposals: [
+          {
+            address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+            symbol: "WETH",
+            amount: 33,
+            id: 1,
+          },
+          {
+            address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+            symbol: "WBTC",
+            amount: 2,
+            id: 2,
+          },
+        ],
+      },
+      {
+        date: "02/10/22",
+        protocol: "Cow DEX",
+        bounty: "10 ETH",
+        contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        id: 3,
+        legalTerms:
+          "Lorem <br/> ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
+        proposals: [
+          {
+            address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+            symbol: "WETH",
+            amount: 33,
+            id: 1,
+          },
+          {
+            address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+            symbol: "WETH",
+            amount: 33,
+            id: 2,
+          },
+        ],
+      },
+      {
+        date: "02/10/22",
+        protocol: "Sushi DAO",
+        bounty: "30 ETH",
+        contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        id: 4,
+        legalTerms:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
+        proposals: [
+          {
+            address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+            symbol: "WETH",
+            amount: 33,
+            id: 1,
+          },
+          {
+            address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+            symbol: "WBTC",
+            amount: 2,
+            id: 2,
+          },
+        ],
+      },
+    ],
+  }),
+  methods: {
+    async createProposal() {
+      this.proposalLoading = true;
+      let provider = this.connectWallet();
+      const web3 = new Web3(provider);
+      const unhacked = new web3.eth.Contract(
+        this.unhackedContract.abi,
+        this.unHackedAddress
+      );
+      unhacked.methods
+        .createBounty(
+          this.refundAmount,
+          this.refundToken,
+          this.refundAddress,
+          this.legalDescription
+        )
+        .send({ from: this.selectedAccount })
+        .then(() => {
+          this.proposalLoading = false;
+        });
+    },
+    openProposalDialog() {
+      this.proposalDialog = true;
+    },
+    connectWallet() {
+      let provider = window.ethereum;
+      if (typeof provider !== "undefined") {
+        //Metamask is installed
+        provider
+          .request({ method: "eth_requestAccounts" })
+          .then((accounts) => {
+            console.log(accounts);
+            this.selectedAccount = accounts[0];
+            if (this.openBounties.length === 0) {
+              let web3 = new Web3(window.ethereum);
+              console.log(web3);
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      return provider;
+    },
+    async settleBounty(bounty) {
+      console.log("bounty object", bounty);
+      let provider = this.connectWallet();
+      provider;
+      let web3 = new Web3(window.ethereum);
+      let erc20Address = bounty.contractAddress;
+      let erc20 = new web3.eth.Contract(this.ERC20, erc20Address);
+      let unHacked = new web3.eth.Contract(
+        this.UnhackedInsurance,
+        this.unHackedAddress
+      );
+
+      if (this.spendCondition == false) {
+        erc20.methods
+          .approve(this.unHackedAddress, bounty.bountyAmount)
           .send({ from: this.selectedAccount })
           .then(() => {
-            this.proposalLoading = false;
+            this.spendCondition = true;
           });
-      },
-      openProposalDialog() {
-        this.proposalDialog = true;
-      },
-      connectWallet() {
-        let provider = window.ethereum;
-        if (typeof provider !== "undefined") {
-          //Metamask is installed
-          provider
-            .request({ method: "eth_requestAccounts" })
-            .then((accounts) => {
-              console.log(accounts);
-              this.selectedAccount = accounts[0];
-              if (this.openBounties.length === 0) {
-                let web3 = new Web3(window.ethereum);
-                console.log(web3);
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-        return provider;
-      },
-      async settleBounty(bounty) {
-
-        console.log("bounty object", bounty);
-        let provider = this.connectWallet();
-        provider ;
-        let web3 = new Web3(window.ethereum);
-        let erc20Address = bounty.contractAddress;
-        let erc20 = new web3.eth.Contract(this.ERC20, erc20Address);
-        let unHacked = new web3.eth.Contract(
-          this.UnhackedInsurance,
-          this.unHackedAddress
-        );
-
-        if (this.spendCondition == false) {
-          erc20.methods
-            .approve(this.unHackedAddress, bounty.bountyAmount)
-            .send({ from: this.selectedAccount })
-            .then(() => {
-              this.spendCondition = true;
-            });
-        }
-        else {
-          unHacked.methods
-            .acceptBountyRequest(bounty.id, bounty.proposals[0].id)
-            .send({ from: this.selectedAccount });
-        }
-      },
-      openDialog(bounty) {
-        this.selectedBounty = bounty;
-        this.dialog = true;
-      },
+      } else {
+        unHacked.methods
+          .acceptBountyRequest(bounty.id, bounty.proposals[0].id)
+          .send({ from: this.selectedAccount });
+      }
     },
-  };
+    openDialog(bounty) {
+      this.selectedBounty = bounty;
+      this.dialog = true;
+    },
+  },
+};
 </script>
 
 <style scoped>
-  .hover {
-    background-color: #c6c4c4;
-  }
+.hover {
+  background-color: #c6c4c4;
+}
 
-  .cardElements {
-    font-size: 15px;
-    font-family: "Kosugi";
-    font-style: normal;
-    background-color: #d9d9d9;
-    border: 2px solid #27ae3d;
-    border-radius: 8px;
-    border-color: #27ae3d;
-    color: black;
-  }
-  .img {
-    background-color: white;
-    border-radius: 23px;
-    width: 200px;
-    height: 130px;
-  }
-  .description {
-    font-size: 15px;
-    font-family: "Kosugi";
-    font-style: normal;
-  }
+.cardElements {
+  font-size: 15px;
+  font-family: "Kosugi";
+  font-style: normal;
+  background-color: #d9d9d9;
+  border: 2px solid #27ae3d;
+  border-radius: 8px;
+  border-color: #27ae3d;
+  color: black;
+}
+.img {
+  background-color: white;
+  border-radius: 23px;
+  width: 200px;
+  height: 130px;
+}
+.description {
+  font-size: 15px;
+  font-family: "Kosugi";
+  font-style: normal;
+}
 
-  .title {
-    font-weight: 400;
-    font-size: 100px;
-    height: 130px;
-    font-family: "Kosugi";
-    font-style: normal;
-  }
-  .card {
-    margin-top: 7%;
-    margin-left: 30%;
-    margin-right: 15%;
-  }
+.title {
+  font-weight: 400;
+  font-size: 100px;
+  height: 130px;
+  font-family: "Kosugi";
+  font-style: normal;
+}
+.card {
+  margin-top: 7%;
+  margin-left: 30%;
+  margin-right: 15%;
+}
 
-  .tableCard {
-    margin-top: 2%;
-    margin-left: 5%;
-    margin-right: 5%;
-  }
-  .connectButton {
-    border: 2px solid #27ae3d;
-    border-radius: 8px;
-    border-color: #27ae3d;
-    margin-top: 12px;
-    background-color: #d9d9d9;
-    color: black;
-    font-family: "Kosugi";
-    font-style: normal;
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 29px;
-  }
-  .navButtons {
-    margin-top: 10px;
-    color: #ffffff;
-    font-family: "Kosugi";
-    font-style: normal;
-    font-weight: 400;
-    font-size: 20px;
+.tableCard {
+  margin-top: 2%;
+  margin-left: 5%;
+  margin-right: 5%;
+}
+.connectButton {
+  border: 2px solid #27ae3d;
+  border-radius: 8px;
+  border-color: #27ae3d;
+  margin-top: 12px;
+  background-color: #d9d9d9;
+  color: black;
+  font-family: "Kosugi";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 29px;
+}
+.navButtons {
+  margin-top: 10px;
+  color: #ffffff;
+  font-family: "Kosugi";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
 
-    line-height: 29px;
-  }
-  .background {
-    background: linear-gradient(
-      111.21deg,
-      #000000 58.96%,
-      rgba(0, 0, 0, 0.53) 108.36%
-    );
-  }
+  line-height: 29px;
+}
+.background {
+  background: linear-gradient(
+    111.21deg,
+    #000000 58.96%,
+    rgba(0, 0, 0, 0.53) 108.36%
+  );
+}
 </style>
