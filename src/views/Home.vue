@@ -11,7 +11,9 @@
         <v-btn variant="text" class="navButtons"> Mission & Vision </v-btn>
       </v-col>
       <v-col align="center">
-        <v-btn class="connectButton"  @click="connectWrapper"> {{state.status ? "Connected" : "Connect Wallet"}} </v-btn>
+        <v-btn class="connectButton" @click="connectWrapper">
+          {{ state.status ? state.address : "Connect Wallet" }}
+        </v-btn>
       </v-col>
     </v-row>
     <v-row class="card">
@@ -61,11 +63,31 @@
       :key="bounty.protocol"
       style="color: white"
     >
+      <!-- <v-menu>
+      <template v-slot:activator="{ props }">
+        <v-btn
+          color="primary"
+          v-bind="props"
+        >
+          Activator slot
+        </v-btn>
+      </template>
+      <v-list>
+        <v-list-item
+          v-for="(item, index) in items"
+          :key="index"
+          :value="index"
+        >
+          <v-list-item-title>{{ item.title }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu> -->
       <v-col align="center">
         <v-hover>
           <template v-slot:default="{ isHovering, props }">
             <v-row class="justify-center">
               <v-col
+                @click="openDialog(bounty)"
                 cols="1"
                 class="cardElements"
                 v-bind="props"
@@ -79,6 +101,7 @@
               </v-col>
               <div style="width: 15px"></div>
               <v-col
+                @click="openDialog(bounty)"
                 align="start"
                 cols="3"
                 class="cardElements"
@@ -93,6 +116,7 @@
               </v-col>
               <div style="width: 15px"></div>
               <v-col
+                @click="openDialog(bounty)"
                 cols="1"
                 class="cardElements"
                 v-bind="props"
@@ -109,63 +133,145 @@
         </v-hover>
       </v-col>
     </v-row>
+    <div class="text-center">
+      <v-dialog v-model="dialog" max-width="60%">
+        <v-carousel show-arrows="hover">
+          <v-carousel-item>
+            <v-card>
+              <v-card-text>
+                {{ selectedBounty.legalTerms }}
+              </v-card-text>
+            </v-card>
+          </v-carousel-item>
+          <v-carousel-item> </v-carousel-item>
+        </v-carousel>
+      </v-dialog>
+    </div>
   </div>
 </template>
 
 <script>
-  import connect from '../composables/connect/index';
+  import connect from "../composables/connect/index";
   export default {
     name: "HomeView",
-	setup: () => {
+    setup: () => {
       const { connectWalletConnect, disconnectWallet, state } = connect();
       const connectUserWallet = async () => {
         await connectWalletConnect();
-    };
-    const disconnectUser = async() => {
-      await disconnectWallet()
-    }
-    return {
-      connectUserWallet,
-      disconnectUser,
-      state
-      }
-	},
+      };
+      const disconnectUser = async () => {
+        await disconnectWallet();
+      };
+      return {
+        connectUserWallet,
+        disconnectUser,
+        state,
+      };
+    },
     data: () => ({
+      dialog: false,
+      selectedBounty: {},
       openBounties: [
         {
           date: "25/10/22",
           protocol: "Ape Factory DeFi",
           bounty: "100 ETH",
           contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          id: 1,
+          legalTerms:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
+          proposals: [
+            {
+              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+              symbol: "WETH",
+              amount: 33,
+            },
+            {
+              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+              symbol: "WBTC",
+              amount: 2,
+            },
+          ],
         },
         {
           date: "29/10/22",
           protocol: "Cow DEX",
           bounty: "25 ETH",
           contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          id: 2,
+          legalTerms:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
+          proposals: [
+            {
+              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+              symbol: "WETH",
+              amount: 33,
+            },
+            {
+              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+              symbol: "WBTC",
+              amount: 2,
+            },
+          ],
         },
         {
           date: "02/10/22",
           protocol: "Cow DEX",
           bounty: "10 ETH",
           contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          id: 3,
+          legalTerms:
+            "Lorem <br/> ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
+          proposals: [
+            {
+              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+              symbol: "WETH",
+              amount: 33,
+            },
+            {
+              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+              symbol: "WETH",
+              amount: 33,
+            },
+          ],
         },
         {
           date: "02/10/22",
           protocol: "Sushi DAO",
           bounty: "30 ETH",
           contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+          id: 4,
+          legalTerms:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
+          proposals: [
+            {
+              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+              symbol: "WETH",
+              amount: 33,
+            },
+            {
+              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+              symbol: "WBTC",
+              amount: 2,
+            },
+          ],
         },
       ],
     }),
-	methods: {
-		connectWrapper(){
-			if (this.state.status == true)
-				this.disconnectUser();
-			else
-				this.connectUserWallet();
-		}
-	}
+    methods: {
+      openDialog(bounty) {
+        this.selectedBounty = bounty;
+        this.dialog = true;
+      },
+      connectWrapper() {
+        if (this.state.status == true) this.disconnectUser();
+        else this.connectUserWallet();
+      },
+    },
   };
 </script>
 
