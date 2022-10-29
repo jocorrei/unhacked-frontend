@@ -11,7 +11,11 @@
         <v-btn variant="text" class="navButtons">Submit proposal</v-btn>
       </v-col>
       <v-col align="center">
-        <v-btn class="connectButton"  @click="connectWrapper"> {{state.status ? state.address.slice(0, 8) + "..." : "Connect Wallet"}} </v-btn>
+        <v-btn class="connectButton" @click="connectWallet">
+          {{
+            selectedAccount ? selectedAccount.slice(0, 8) + "..." : "Connect Wallet"
+          }}
+        </v-btn>
       </v-col>
     </v-row>
     <v-row class="card">
@@ -225,6 +229,7 @@
     data: () => ({
       dialog: false,
       selectedBounty: {},
+      selectedAccount: "",
       openBounties: [
         {
           date: "25/10/22",
@@ -328,16 +333,38 @@
       settleBounty(bounty) {
         bounty;
         let provider = window.ethereum;
+        if (typeof provider !== "undefined") {
+          //Metamask is installed
+          provider
+            .request({ method: "eth_requestAccounts" })
+            .then((accounts) => {
+              console.log(accounts);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
         console.log("testing provider", provider);
-
       },
       openDialog(bounty) {
         this.selectedBounty = bounty;
         this.dialog = true;
       },
-      connectWrapper() {
-        if (this.state.status == true) this.disconnectUser();
-        else this.connectUserWallet();
+      connectWallet() {
+        let provider = window.ethereum;
+        if (typeof provider !== "undefined") {
+          //Metamask is installed
+          provider
+            .request({ method: "eth_requestAccounts" })
+            .then((accounts) => {
+              console.log(accounts);
+              this.selectedAccount = accounts[0]
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+        console.log("testing provider", provider);
       },
     },
   };
