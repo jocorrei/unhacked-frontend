@@ -11,7 +11,7 @@
         <v-btn variant="text" class="navButtons"> Mission & Vision </v-btn>
       </v-col>
       <v-col align="center">
-        <v-btn class="connectButton"  @click="connectWrapper"> {{state.status ? "Connected" : "Connect Wallet"}} </v-btn>
+        <v-btn class="connectButton"  @click="connectWrapper"> {{state.status ? state.address.slice(0, 8) + "..." : "Connect Wallet"}} </v-btn>
       </v-col>
     </v-row>
     <v-row class="card">
