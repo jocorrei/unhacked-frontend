@@ -8,12 +8,16 @@
         <v-btn variant="text" class="navButtons"> Mission & Vision </v-btn>
       </v-col>
       <v-col align="center">
-        <v-btn variant="text" class="navButtons">Submit proposal</v-btn>
+        <v-btn variant="text" class="navButtons" @click="openProposalDialog"
+          >Submit proposal</v-btn
+        >
       </v-col>
       <v-col align="center">
         <v-btn class="connectButton" @click="connectWallet">
           {{
-            selectedAccount ? selectedAccount.slice(0, 8) + "..." : "Connect Wallet"
+            selectedAccount
+              ? selectedAccount.slice(0, 8) + "..."
+              : "Connect Wallet"
           }}
         </v-btn>
       </v-col>
@@ -54,66 +58,70 @@
         </v-row>
       </v-col>
     </v-row>
-    <v-row style="margin-top: 50px">
+    <v-row style="margin-top: 50px" v-if="selectedAccount">
       <v-col align="center" class="mb-0">
         <h3 class="description" style="color: white">Open Bounties</h3>
       </v-col>
     </v-row>
-    <v-row
-      class="tableCard"
-      v-for="bounty in openBounties"
-      :key="bounty.protocol"
-      style="color: white"
-    >
-      <v-col align="center">
-        <v-hover>
-          <template v-slot:default="{ isHovering, props }">
-            <v-row class="justify-center">
-              <v-col
-                @click="openDialog(bounty)"
-                cols="1"
-                class="cardElements"
-                v-bind="props"
-                :style="
-                  isHovering
-                    ? 'background-color: #c6c4c4; cursor: pointer'
-                    : 'background-color: #d9d9d9;'
-                "
-              >
-                {{ bounty.date }}
-              </v-col>
-              <div style="width: 15px"></div>
-              <v-col
-                @click="openDialog(bounty)"
-                align="start"
-                cols="3"
-                class="cardElements"
-                v-bind="props"
-                :style="
-                  isHovering
-                    ? 'background-color: #c6c4c4; cursor: pointer'
-                    : 'background-color: #d9d9d9;'
-                "
-              >
-                {{ bounty.protocol }}
-              </v-col>
-              <div style="width: 15px"></div>
-              <v-col
-                @click="openDialog(bounty)"
-                cols="1"
-                class="cardElements"
-                v-bind="props"
-                :style="
-                  isHovering
-                    ? 'background-color: #c6c4c4; cursor: pointer'
-                    : 'background-color: #d9d9d9;'
-                "
-              >
-                {{ bounty.bounty }}
-              </v-col>
-            </v-row>
-          </template>
-        </v-hover>
+    <v-row class="ma-0 pa-0" v-if="selectedAccount">
+      <v-col class="ma-0 pa-0">
+        <v-row
+          class="tableCard"
+          v-for="bounty in openBounties"
+          :key="bounty.protocol"
+          style="color: white"
+        >
+          <v-col align="center">
+            <v-hover>
+              <template v-slot:default="{ isHovering, props }">
+                <v-row class="justify-center">
+                  <v-col
+                    @click="openDialog(bounty)"
+                    cols="1"
+                    class="cardElements"
+                    v-bind="props"
+                    :style="
+                      isHovering
+                        ? 'background-color: #c6c4c4; cursor: pointer'
+                        : 'background-color: #d9d9d9;'
+                    "
+                  >
+                    {{ bounty.date }}
+                  </v-col>
+                  <div style="width: 15px"></div>
+                  <v-col
+                    @click="openDialog(bounty)"
+                    align="start"
+                    cols="3"
+                    class="cardElements"
+                    v-bind="props"
+                    :style="
+                      isHovering
+                        ? 'background-color: #c6c4c4; cursor: pointer'
+                        : 'background-color: #d9d9d9;'
+                    "
+                  >
+                    {{ bounty.protocol }}
+                  </v-col>
+                  <div style="width: 15px"></div>
+                  <v-col
+                    @click="openDialog(bounty)"
+                    cols="1"
+                    class="cardElements"
+                    v-bind="props"
+                    :style="
+                      isHovering
+                        ? 'background-color: #c6c4c4; cursor: pointer'
+                        : 'background-color: #d9d9d9;'
+                    "
+                  >
+                    {{ bounty.bounty }}
+                  </v-col>
+                </v-row>
+              </template>
+            </v-hover>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
 
@@ -205,11 +213,75 @@
         </v-carousel>
       </v-dialog>
     </div>
+    <div class="text-center">
+      <v-dialog v-model="proposalDialog" max-width="60%">
+        <div
+          class="cardElements"
+          style="
+            background-color: #c6c4c4;
+            align-self: center;
+            width: 100%;
+            padding-left: 20px;
+            padding-right: 20px;
+          "
+        >
+          <v-row>
+            <v-col>
+              <h3 class="description ml-1 mt-2">Create a proposal:</h3>
+            </v-col>
+          </v-row>
+          <v-row class="justify-center">
+            <v-col>
+              <v-text-field
+                v-model="refundAddress"
+                label="Address to refund when agreement is settled"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="refundAmount"
+                label="Amount of the bounty"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-text-field
+                v-model="refundToken"
+                label="Refund token address"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-textarea v-model="legalDescription" label="Legal Terms" />
+            </v-col>
+          </v-row>
+          <v-row class="ma-0 pa-0" style="text-align-last: right">
+            <v-col class="mb-2 pa-0">
+              <v-btn
+                :loading="proposalLoading"
+                class="connectButton"
+                style="font-size: 15px"
+                @click="createProposal"
+              >
+                Create Proposal
+              </v-btn>
+            </v-col>
+          </v-row>
+        </div>
+      </v-dialog>
+    </div>
   </div>
 </template>
 
 <script>
   import connect from "../composables/connect/index";
+  import ERC20ABI from "@/abi/ERC20abi.json";
+  import UNHACKEDABI from "@/abi/unhackedInsurance.json";
+  import Web3 from "web3";
   export default {
     name: "HomeView",
     setup: () => {
@@ -227,9 +299,18 @@
       };
     },
     data: () => ({
+      unhackedContract: UNHACKEDABI,
+      erc20Contract: ERC20ABI,
+      proposalLoading: false,
+      proposalDialog: false,
       dialog: false,
       selectedBounty: {},
+      refundAddress: "",
+      refundAmount: "",
+      refundToken: "",
+      legalDescription: "",
       selectedAccount: "",
+      unHackedAddress: "0xB7fD3d13910a16961F1cef2E1CFD55402cf68A01",
       openBounties: [
         {
           date: "25/10/22",
@@ -330,8 +411,40 @@
       ],
     }),
     methods: {
-      settleBounty() {
-        let bounty = this.selectedBounty
+      async createProposal() {
+        this.proposalLoading = true;
+        let provider = window.ethereum;
+        if (typeof provider !== "undefined") {
+          //Metamask is installed
+          provider
+            .request({ method: "eth_requestAccounts" })
+            .then((accounts) => {
+              console.log(accounts);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }
+        const web3 = new Web3(provider);
+        const unhacked = new web3.eth.Contract(
+          this.unhackedContract.abi,
+          this.unHackedAddress
+        );
+        unhacked.methods
+          .createBounty(
+            this.refundAmount,
+            this.refundToken,
+            this.refundAddress,
+            this.legalDescription
+          )
+          .send({ from: this.selectedAccount })
+          .then(() => {
+            this.proposalLoading = false;
+          });
+
+      },
+      async settleBounty() {
+        let bounty = this.selectedBounty;
 
         console.log("bounty object", bounty);
         let provider = window.ethereum;
@@ -346,11 +459,17 @@
               console.log(err);
             });
         }
-        console.log("testing provider", provider);
+
+        const web3 = new Web3(provider);
+        const networkId = await web3.eth.net.getId();
+        console.log("testing ID", networkId);
       },
       openDialog(bounty) {
         this.selectedBounty = bounty;
         this.dialog = true;
+      },
+      openProposalDialog() {
+        this.proposalDialog = true;
       },
       connectWallet() {
         let provider = window.ethereum;
@@ -360,7 +479,7 @@
             .request({ method: "eth_requestAccounts" })
             .then((accounts) => {
               console.log(accounts);
-              this.selectedAccount = accounts[0]
+              this.selectedAccount = accounts[0];
             })
             .catch((err) => {
               console.log(err);
