@@ -11,7 +11,7 @@
         <v-btn variant="text" class="navButtons"> Mission & Vision </v-btn>
       </v-col>
       <v-col align="center">
-        <v-btn class="connectButton"> Connect Wallet </v-btn>
+        <v-btn class="connectButton"  @click="connectWrapper"> {{state.status ? "Connected" : "Connect Wallet"}} </v-btn>
       </v-col>
     </v-row>
     <v-row class="card">
@@ -113,9 +113,23 @@
 </template>
 
 <script>
+  import connect from '../composables/connect/index';
   export default {
     name: "HomeView",
-
+	setup: () => {
+      const { connectWalletConnect, disconnectWallet, state } = connect();
+      const connectUserWallet = async () => {
+        await connectWalletConnect();
+    };
+    const disconnectUser = async() => {
+      await disconnectWallet()
+    }
+    return {
+      connectUserWallet,
+      disconnectUser,
+      state
+      }
+	},
     data: () => ({
       openBounties: [
         {
@@ -144,7 +158,14 @@
         },
       ],
     }),
-    methods: {},
+	methods: {
+		connectWrapper(){
+			if (this.state.status == true)
+				this.disconnectUser();
+			else
+				this.connectUserWallet();
+		}
+	}
   };
 </script>
 

@@ -8,6 +8,8 @@
 
 <script>
 import HomeView from '@/views/Home.vue'
+import connect from './composables/connect/index';
+import {onMounted} from "vue";
 
 export default {
   name: 'App',
@@ -15,7 +17,12 @@ export default {
   components: {
     HomeView,
   },
-
+  setup: () => {
+    const { autoConnect} = connect();
+     onMounted(async () => {
+      await autoConnect()
+    })
+  },
   data: () => ({
     //
   }),
