@@ -194,7 +194,7 @@
                     <v-btn
                       class="cardElements"
                       style="background-color: #c6c4c4"
-                      @click="settleBounty(bounty)"
+                      @click="settleBounty(selectedBounty)"
                       >Settle</v-btn
                     >
                   </v-col>
@@ -330,8 +330,10 @@
       ],
     }),
     methods: {
-      settleBounty(bounty) {
-        bounty;
+      settleBounty() {
+        let bounty = this.selectedBounty
+
+        console.log("bounty object", bounty);
         let provider = window.ethereum;
         if (typeof provider !== "undefined") {
           //Metamask is installed
