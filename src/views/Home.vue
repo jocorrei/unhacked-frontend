@@ -2,13 +2,13 @@
   <div class="background" style="height: 120%; min-height: 100vh">
     <v-row>
       <v-col align="center">
-        <v-btn variant="text" class="navButtons"> Submit proposal</v-btn>
-      </v-col>
-      <v-col align="center">
-        <v-btn variant="text" class="navButtons"> Accept settlement</v-btn>
+        <v-btn variant="text" class="navButtons"> FAQ </v-btn>
       </v-col>
       <v-col align="center">
         <v-btn variant="text" class="navButtons"> Mission & Vision </v-btn>
+      </v-col>
+      <v-col align="center">
+        <v-btn variant="text" class="navButtons">Submit proposal</v-btn>
       </v-col>
       <v-col align="center">
         <v-btn class="connectButton" @click="connectWrapper">
@@ -63,25 +63,6 @@
       :key="bounty.protocol"
       style="color: white"
     >
-      <!-- <v-menu>
-      <template v-slot:activator="{ props }">
-        <v-btn
-          color="primary"
-          v-bind="props"
-        >
-          Activator slot
-        </v-btn>
-      </template>
-      <v-list>
-        <v-list-item
-          v-for="(item, index) in items"
-          :key="index"
-          :value="index"
-        >
-          <v-list-item-title>{{ item.title }}</v-list-item-title>
-        </v-list-item>
-      </v-list>
-    </v-menu> -->
       <v-col align="center">
         <v-hover>
           <template v-slot:default="{ isHovering, props }">
@@ -133,17 +114,92 @@
         </v-hover>
       </v-col>
     </v-row>
+
     <div class="text-center">
       <v-dialog v-model="dialog" max-width="60%">
-        <v-carousel show-arrows="hover">
-          <v-carousel-item>
-            <v-card>
-              <v-card-text>
-                {{ selectedBounty.legalTerms }}
-              </v-card-text>
-            </v-card>
+        <v-carousel
+          height="400"
+          hide-delimiter-background
+          show-arrows="hover"
+          class="cardElements"
+          hide-delimiters
+        >
+          <v-carousel-item cover>
+            <v-row>
+              <v-col>
+                <v-row class="ml-2 mt-1">
+                  <v-col>
+                    <h3>Agreement Terms:</h3>
+                  </v-col>
+                </v-row>
+                <v-row class="ml-1 mr-1">
+                  <v-col>
+                    {{ selectedBounty.legalTerms }}
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
           </v-carousel-item>
-          <v-carousel-item> </v-carousel-item>
+          <v-carousel-item cover>
+            <v-row class="justify-center ml-8 mt-2 mb-0">
+              <v-col>
+                <h3 class="description">Disclamer:</h3>
+              </v-col>
+            </v-row>
+            <v-row class="justify-center ml-8">
+              <v-col class="pt-0">
+                <p class="description">
+                  It's reponsability of the proposal creator to verify the
+                  address before settle the agreement
+                </p>
+              </v-col>
+            </v-row>
+            <v-row class="justify-content ml-8 mt-4">
+              <v-col>
+                <h2 class="description">
+                  Open proposals for {{ selectedBounty.protocol }}:
+                </h2>
+              </v-col>
+            </v-row>
+            <v-row
+              class="tableCard"
+              v-for="proposal in selectedBounty.proposals"
+              :key="proposal.id"
+            >
+              <v-col align="center">
+                <v-row class="justify-center">
+                  <v-col
+                    class="cardElements"
+                    style="background-color: #c6c4c4; align-self: center"
+                  >
+                    {{ proposal.address }}</v-col
+                  >
+                  <v-col
+                    class="cardElements ml-1"
+                    cols="1"
+                    style="background-color: #c6c4c4; align-self: center"
+                  >
+                    {{ proposal.symbol }}
+                  </v-col>
+                  <v-col
+                    class="cardElements ml-1"
+                    cols="1"
+                    style="background-color: #c6c4c4; align-self: center"
+                  >
+                    {{ proposal.amount }}
+                  </v-col>
+                  <v-col cols="1">
+                    <v-btn
+                      class="cardElements"
+                      style="background-color: #c6c4c4"
+                      @click="settleBounty(proposal)"
+                      >Settle</v-btn
+                    >
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+          </v-carousel-item>
         </v-carousel>
       </v-dialog>
     </div>
@@ -186,11 +242,13 @@
               address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
               symbol: "WETH",
               amount: 33,
+              id: 1,
             },
             {
               address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
               symbol: "WBTC",
               amount: 2,
+              id: 2,
             },
           ],
         },
@@ -208,11 +266,13 @@
               address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
               symbol: "WETH",
               amount: 33,
+              id: 1,
             },
             {
               address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
               symbol: "WBTC",
               amount: 2,
+              id: 2,
             },
           ],
         },
@@ -230,11 +290,13 @@
               address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
               symbol: "WETH",
               amount: 33,
+              id: 1,
             },
             {
               address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
               symbol: "WETH",
               amount: 33,
+              id: 2,
             },
           ],
         },
@@ -252,11 +314,13 @@
               address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
               symbol: "WETH",
               amount: 33,
+              id: 1,
             },
             {
               address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
               symbol: "WBTC",
               amount: 2,
+              id: 2,
             },
           ],
         },
@@ -279,6 +343,7 @@
   .hover {
     background-color: #c6c4c4;
   }
+
   .cardElements {
     font-size: 15px;
     font-family: "Kosugi";
