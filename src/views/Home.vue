@@ -10,18 +10,25 @@
       <v-col align="center">
         <v-btn variant="text" class="navButtons"> Mission & Vision </v-btn>
       </v-col >
-      <v-col align="center"> <v-btn>Connect Wallet</v-btn> </v-col>
+      <v-col align="center"> <v-btn @click="showWalletConnect">Connect Wallet</v-btn> </v-col>
     </v-row>
   </div>
 </template>
 
 <script>
+  
   export default {
     name: "HomeView",
 
     data: () => ({
       text: "",
     }),
+	methods: {
+		// showWalletConnect
+		showWalletConnect(e){
+			console.log("emitted event", e);
+		}
+	}
   };
 </script>
 
