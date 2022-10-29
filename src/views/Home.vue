@@ -192,7 +192,7 @@
                     <v-btn
                       class="cardElements"
                       style="background-color: #c6c4c4"
-                      @click="settleBounty(proposal)"
+                      @click="settleBounty(bounty)"
                       >Settle</v-btn
                     >
                   </v-col>
@@ -327,6 +327,12 @@
       ],
     }),
     methods: {
+      settleBounty(bounty) {
+        bounty;
+        let provider = window.ethereum;
+        console.log("testing provider", provider);
+
+      },
       openDialog(bounty) {
         this.selectedBounty = bounty;
         this.dialog = true;
