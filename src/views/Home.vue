@@ -278,26 +278,11 @@
 </template>
 
 <script>
-  import connect from "../composables/connect/index";
   import ERC20ABI from "@/abi/ERC20abi.json";
   import UNHACKEDABI from "@/abi/UnhackedInsurance.json";
   import Web3 from "web3";
   export default {
     name: "HomeView",
-    setup: () => {
-      const { connectWalletConnect, disconnectWallet, state } = connect();
-      const connectUserWallet = async () => {
-        await connectWalletConnect();
-      };
-      const disconnectUser = async () => {
-        await disconnectWallet();
-      };
-      return {
-        connectUserWallet,
-        disconnectUser,
-        state,
-      };
-    },
     data: () => ({
       unhackedContract: UNHACKEDABI,
       erc20Contract: ERC20ABI,
@@ -310,7 +295,7 @@
       refundToken: "",
       legalDescription: "",
       selectedAccount: "",
-      unHackedAddress: "0xB7fD3d13910a16961F1cef2E1CFD55402cf68A01",
+      unHackedAddress: "0xd7c9fb30a9719a37db1b4a2981b8d562d8fbe55b",
       openBounties: [
         {
           date: "25/10/22",
@@ -413,18 +398,7 @@
     methods: {
       async createProposal() {
         this.proposalLoading = true;
-        let provider = window.ethereum;
-        if (typeof provider !== "undefined") {
-          //Metamask is installed
-          provider
-            .request({ method: "eth_requestAccounts" })
-            .then((accounts) => {
-              console.log(accounts);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
+        let provider = this.connectWallet();
         const web3 = new Web3(provider);
         const unhacked = new web3.eth.Contract(
           this.unhackedContract.abi,
@@ -454,30 +428,23 @@
             .then((accounts) => {
               console.log(accounts);
               this.selectedAccount = accounts[0];
+              if (this.openBounties.length === 0) {
+                let web3 = new Web3(window.ethereum);
+                console.log(web3);
+              }
             })
             .catch((err) => {
               console.log(err);
             });
         }
+        return provider;
       },
       async settleBounty(bounty) {
 
         console.log("bounty object", bounty);
-        let provider = window.ethereum;
-        if (typeof provider !== "undefined") {
-          //Metamask is installed
-          provider
-            .request({ method: "eth_requestAccounts" })
-            .then((accounts) => {
-              console.log(accounts);
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }
-
+        let provider = this.connectWallet();
+        provider ;
         let web3 = new Web3(window.ethereum);
-
         let erc20Address = bounty.contractAddress;
         let erc20 = new web3.eth.Contract(this.ERC20, erc20Address);
         let unHacked = new web3.eth.Contract(
