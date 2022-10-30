@@ -67,8 +67,8 @@
       <v-col class="ma-0 pa-0">
         <v-row
           class="tableCard"
-          v-for="bounty in openBounties"
-          :key="bounty.protocol"
+          v-for="(bounty, index) in openBounties"
+          :key="index"
           style="color: white"
         >
           <v-col align="center">
@@ -76,7 +76,7 @@
               <template v-slot:default="{ isHovering, props }">
                 <v-row class="justify-center">
                   <v-col
-                    @click="openDialog(bounty)"
+                    @click="openDialog(bounty, index)"
                     cols="1"
                     class="cardElements"
                     v-bind="props"
@@ -90,7 +90,7 @@
                   </v-col>
                   <div style="width: 15px"></div>
                   <v-col
-                    @click="openDialog(bounty)"
+                    @click="openDialog(bounty, index)"
                     align="start"
                     cols="3"
                     class="cardElements"
@@ -105,7 +105,7 @@
                   </v-col>
                   <div style="width: 15px"></div>
                   <v-col
-                    @click="openDialog(bounty)"
+                    @click="openDialog(bounty, index)"
                     cols="1"
                     class="cardElements"
                     v-bind="props"
@@ -173,8 +173,8 @@
             </v-row>
             <v-row
               class="tableCard"
-              v-for="proposal in selectedBounty.proposals"
-              :key="proposal.id"
+              v-for="(proposal, index) in selectedBounty.proposals"
+              :key="index"
             >
               <v-col align="center">
                 <v-row class="justify-center">
@@ -256,6 +256,14 @@
           </v-row>
           <v-row>
             <v-col>
+              <v-text-field
+                v-model="refundTitle"
+                label="Name of the organization"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col>
               <v-textarea v-model="legalDescription" label="Legal Terms" />
             </v-col>
           </v-row>
@@ -281,119 +289,29 @@
   import ERC20ABI from "@/abi/ERC20abi.json";
   import UNHACKEDABI from "@/abi/UnhackedInsurance.json";
   import Web3 from "web3";
+  import moment from "moment";
   export default {
     name: "HomeView",
     data: () => ({
+      chainId: null,
       unhackedContract: UNHACKEDABI,
       erc20Contract: ERC20ABI,
       proposalLoading: false,
       proposalDialog: false,
       dialog: false,
       selectedBounty: {},
+      refundTitle: "",
       refundAddress: "",
       refundAmount: "",
       refundToken: "",
       legalDescription: "",
       selectedAccount: "",
-      unHackedAddress: "0xd7c9fb30a9719a37db1b4a2981b8d562d8fbe55b",
-      openBounties: [
-        {
-          date: "25/10/22",
-          protocol: "Ape Factory DeFi",
-          bounty: "100 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          id: 1,
-          legalTerms:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
-          proposals: [
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 1,
-            },
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WBTC",
-              amount: 2,
-              id: 2,
-            },
-          ],
-        },
-        {
-          date: "29/10/22",
-          protocol: "Cow DEX",
-          bounty: "25 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          id: 2,
-          legalTerms:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
-          proposals: [
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 1,
-            },
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WBTC",
-              amount: 2,
-              id: 2,
-            },
-          ],
-        },
-        {
-          date: "02/10/22",
-          protocol: "Cow DEX",
-          bounty: "10 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          id: 3,
-          legalTerms:
-            "Lorem <br/> ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
-          proposals: [
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 1,
-            },
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 2,
-            },
-          ],
-        },
-        {
-          date: "02/10/22",
-          protocol: "Sushi DAO",
-          bounty: "30 ETH",
-          contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-          id: 4,
-          legalTerms:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ex augue, suscipit ut congue sit amet, iaculis sed augue. In fringilla in odio cursus tristique. Etiam venenatis finibus arcu, sed fermentum leo. Phasellus id finibus mi. Nulla leo eros, rhoncus vel commodo sed, sollicitudin nec quam. Mauris ut nibh eros. Phasellus vitae dignissim felis. Vestibulum eu eleifend nibh.Integer consequat vehicula justo nec tristique. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin facilisis imperdiet neque in hendrerit. Donec finibus lectus ac dolor facilisis scelerisque. Aliquam mattis nisl enim, sit amet mollis sapien tincidunt at. Duis elementum vitae nisi et pretium. Integer feugiat mauris non tristique lobortis.Vivamus ac tellus sed ligula accumsan dictum at at diam. Nulla sit amet massa eget nisl eleifend mattis in in augue. Duis eget accumsan risus. Quisque ac quam id tellus vulputate laoreet sed a risus. Aliquam sed diam purus. Maecenas in lacus pharetra, sagittis leo at, fringilla leo. Praesent vestibulum, odio ut hendrerit semper, arcu felis facilisis dolor, vel pretium dolor nulla sagittis urna. Donec consequat vehicula ante, non semper dui scelerisque vel. Sed ut magna eu quam tristique mattis. Cras facilisis pulvinar fringilla. Pellentesque placerat diam ut justo pharetra convallis.",
-          proposals: [
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WETH",
-              amount: 33,
-              id: 1,
-            },
-            {
-              address: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
-              symbol: "WBTC",
-              amount: 2,
-              id: 2,
-            },
-          ],
-        },
-      ],
+      unHackedAddress: {
+        1: "0x8c8bdBe9CeE455732525086264a4Bf9Cf821C498",
+        4: "0x8c8bdBe9CeE455732525086264a4Bf9Cf821C498",
+        43113: "0x5B85812dA1C35B29e10935551360C5daa6f80Dc4",
+      },
+      openBounties: [],
     }),
     methods: {
       async createProposal() {
@@ -402,36 +320,75 @@
         const web3 = new Web3(provider);
         const unhacked = new web3.eth.Contract(
           this.unhackedContract.abi,
-          this.unHackedAddress
+          this.unHackedAddress[`${this.chainId}`]
         );
         unhacked.methods
           .createBounty(
-            this.refundAmount,
+            this.refundAmount + "000000000000000000",
             this.refundToken,
             this.refundAddress,
+            this.refundTitle,
             this.legalDescription
           )
           .send({ from: this.selectedAccount })
           .then(() => {
+            let payload = {
+              date: moment().format("L"),
+              legalTerms: this.legalDescription,
+              bounty: this.refundAmount + "000000000000000000" + " USDC",
+              protocol: this.refundTitle,
+            };
+            this.openBounties.push(payload);
+
+            this.refundAmount = "";
+            this.refundToken = "";
+            this.refundAddress = "";
+            this.refundTitle = "";
+            this.legalDescription = "";
+
             this.proposalLoading = false;
+            this.proposalModal = false;
           });
       },
       openProposalDialog() {
         this.proposalDialog = true;
       },
-      connectWallet() {
+      async connectWallet() {
         let provider = window.ethereum;
         if (typeof provider !== "undefined") {
           //Metamask is installed
           provider
             .request({ method: "eth_requestAccounts" })
             .then((accounts) => {
-              console.log(accounts);
               this.selectedAccount = accounts[0];
-              if (this.openBounties.length === 0) {
-                let web3 = new Web3(window.ethereum);
-                console.log(web3);
-              }
+              let web3 = new Web3(window.ethereum);
+              web3.eth.getChainId().then((r) => {
+                this.chainId = r;
+                if (this.openBounties.length === 0) {
+                  const unhacked = new web3.eth.Contract(
+                    this.unhackedContract.abi,
+                    this.unHackedAddress[`${this.chainId}`]
+                  );
+                  unhacked.methods
+                    .getBountyList()
+                    .call()
+                    .then((r) => {
+                      r.forEach((bounty) => {
+                        console.log(bounty);
+                        let payload = {
+                          legalTerms: bounty[6],
+                          date: moment().format("L"),
+                          protocol: bounty[5],
+                          bounty: bounty[2].slice(0, -14) + " USDC",
+                          paymentToken: bounty[3],
+                        };
+                        this.openBounties.push(payload);
+                        console.log(payload);
+                      });
+                      console.log(r);
+                    });
+                }
+              });
             })
             .catch((err) => {
               console.log(err);
@@ -440,35 +397,56 @@
         return provider;
       },
       async settleBounty(bounty) {
-
-        console.log("bounty object", bounty);
         let provider = this.connectWallet();
-        provider ;
+        provider;
         let web3 = new Web3(window.ethereum);
         let erc20Address = bounty.contractAddress;
         let erc20 = new web3.eth.Contract(this.ERC20, erc20Address);
         let unHacked = new web3.eth.Contract(
           this.UnhackedInsurance,
-          this.unHackedAddress
+          this.unHackedAddress[`${this.chainId}`]
         );
 
         if (this.spendCondition == false) {
           erc20.methods
-            .approve(this.unHackedAddress, bounty.bountyAmount)
+            .approve(this.unHackedAddress[`${this.chainId}`], bounty.bountyAmount)
             .send({ from: this.selectedAccount })
             .then(() => {
               this.spendCondition = true;
             });
-        }
-        else {
+        } else {
           unHacked.methods
             .acceptBountyRequest(bounty.id, bounty.proposals[0].id)
             .send({ from: this.selectedAccount });
         }
       },
-      openDialog(bounty) {
-        this.selectedBounty = bounty;
-        this.dialog = true;
+      async openDialog(bounty, index) {
+        let web3 = new Web3(window.ethereum);
+        let unHacked = new web3.eth.Contract(
+          this.unhackedContract.abi,
+          this.unHackedAddress[`${this.chainId}`]
+        );
+        unHacked.methods
+          .getBountyRequestList(index)
+          .call()
+          .then((r) => {
+            if (r.lenght !== 0) {
+              this.selectedBounty.proposals = [];
+              this.selectedBounty.legalTerms = bounty.legalTerms;
+              r.forEach((proposal) => {
+                let payload = {
+                  amount: proposal[1].slice(0, -6),
+                  symbol: "USDC",
+                  address: proposal[2],
+                };
+                this.selectedBounty.proposals.push(payload);
+              });
+              this.dialog = true;
+            }
+          })
+          .finally(() => {
+            console.log("end");
+          });
       },
     },
   };
