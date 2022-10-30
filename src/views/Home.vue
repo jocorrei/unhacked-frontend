@@ -430,7 +430,7 @@
               this.settleLoading = false;
             });
         } else {
-          console.log("testing index", index);
+          console.log("testing index", bounty.id);
           unHacked.methods
             .acceptBountyRequest(bounty.id, index)
             .send({ from: this.selectedAccount })
@@ -453,6 +453,7 @@
             if (r.lenght !== 0) {
               this.selectedBounty.proposals = [];
               this.selectedBounty.legalTerms = bounty.legalTerms;
+              this.selectedBounty.id = bounty.id;
               r.forEach((proposal) => {
                 let payload = {
                   amount: proposal[1].slice(0, -6),
