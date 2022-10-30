@@ -345,6 +345,7 @@
               legalTerms: this.legalDescription,
               bounty: this.refundAmount + " USDC",
               protocol: this.refundTitle,
+              id: this.openBounties.length,
             };
             this.openBounties.push(payload);
 
@@ -389,6 +390,7 @@
                           protocol: bounty[5],
                           bounty: bounty[2].slice(0, -6) + " USDC",
                           paymentToken: bounty[3],
+                          id: this.openBounties.length,
                         };
                         this.openBounties.push(payload);
                         console.log(payload);
@@ -430,7 +432,7 @@
         } else {
           console.log("testing index", index);
           unHacked.methods
-            .acceptBountyRequest(3, index)
+            .acceptBountyRequest(bounty.id, index)
             .send({ from: this.selectedAccount })
             .then(() => {
               this.settleLoading = false;
