@@ -204,9 +204,10 @@
                   </v-col>
                   <v-col cols="1">
                     <v-btn
+                      :loading="settleLoading"
                       class="cardElements"
                       style="background-color: #c6c4c4"
-                      @click="settleBounty(selectedBounty)"
+                      @click="settleBounty(selectedBounty, index)"
                       >{{ spendCondition ? "Settle" : "Approve" }}</v-btn
                     >
                   </v-col>
@@ -298,6 +299,7 @@
     name: "HomeView",
     data: () => ({
       chainId: null,
+      settleLoading: false,
       unhackedContract: UNHACKEDABI,
       erc20Contract: ERC20ABI,
       proposalLoading: false,
@@ -310,6 +312,7 @@
       refundToken: "",
       legalDescription: "",
       selectedAccount: "",
+      spendCondition: false,
       unHackedAddress: {
         1: "0x8c8bdBe9CeE455732525086264a4Bf9Cf821C498",
         43113: "0x5B85812dA1C35B29e10935551360C5daa6f80Dc4",
@@ -321,7 +324,8 @@
       async createProposal() {
         this.proposalLoading = true;
         let provider = this.connectWallet();
-        const web3 = new Web3(provider);
+        provider;
+        const web3 = new Web3(window.ethereum);
         const unhacked = new web3.eth.Contract(
           this.unhackedContract.abi,
           this.unHackedAddress[`${this.chainId}`]
@@ -339,7 +343,7 @@
             let payload = {
               date: moment().format("L"),
               legalTerms: this.legalDescription,
-              bounty: this.refundAmount + "000000" + " USDC",
+              bounty: this.refundAmount + " USDC",
               protocol: this.refundTitle,
             };
             this.openBounties.push(payload);
@@ -351,7 +355,7 @@
             this.legalDescription = "";
 
             this.proposalLoading = false;
-            this.proposalModal = false;
+            this.proposalDialog = false;
           });
       },
       openProposalDialog() {
@@ -400,28 +404,38 @@
         }
         return provider;
       },
-      async settleBounty(bounty) {
+      async settleBounty(bounty, index) {
+        this.settleLoading = true;
         let provider = this.connectWallet();
         provider;
         let web3 = new Web3(window.ethereum);
-        let erc20Address = bounty.contractAddress;
-        let erc20 = new web3.eth.Contract(this.ERC20, erc20Address);
+        let erc20Address = bounty.proposals[index].address;
+        let erc20 = new web3.eth.Contract(this.erc20Contract.abi, erc20Address);
         let unHacked = new web3.eth.Contract(
-          this.UnhackedInsurance,
+          this.unhackedContract.abi,
           this.unHackedAddress[`${this.chainId}`]
         );
 
         if (this.spendCondition == false) {
           erc20.methods
-            .approve(this.unHackedAddress[`${this.chainId}`], bounty.bountyAmount)
+            .approve(
+              this.unHackedAddress[`${this.chainId}`],
+              bounty.proposals[index].amount + "000000"
+            )
             .send({ from: this.selectedAccount })
             .then(() => {
               this.spendCondition = true;
+              this.settleLoading = false;
             });
         } else {
+          console.log("testing index", index);
           unHacked.methods
-            .acceptBountyRequest(bounty.id, bounty.proposals[0].id)
-            .send({ from: this.selectedAccount });
+            .acceptBountyRequest(3, index)
+            .send({ from: this.selectedAccount })
+            .then(() => {
+              this.settleLoading = false;
+              this.dialog = false;
+            });
         }
       },
       async openDialog(bounty, index) {
