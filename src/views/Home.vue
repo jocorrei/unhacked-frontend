@@ -422,7 +422,7 @@
           erc20.methods
             .approve(
               this.unHackedAddress[`${this.chainId}`],
-              bounty.proposals[index].amount + "000000"
+              bounty.proposals[index].amount + "00000000000"
             )
             .send({ from: this.selectedAccount })
             .then(() => {
