@@ -312,8 +312,8 @@
       selectedAccount: "",
       unHackedAddress: {
         1: "0x8c8bdBe9CeE455732525086264a4Bf9Cf821C498",
-        4: "0x8c8bdBe9CeE455732525086264a4Bf9Cf821C498",
         43113: "0x5B85812dA1C35B29e10935551360C5daa6f80Dc4",
+        100: "0xD7C9fb30A9719A37dB1b4a2981B8d562D8FBE55B",
       },
       openBounties: [],
     }),
@@ -328,7 +328,7 @@
         );
         unhacked.methods
           .createBounty(
-            this.refundAmount + "000000000000000000",
+            this.refundAmount + "000000",
             this.refundToken,
             this.refundAddress,
             this.refundTitle,
@@ -339,7 +339,7 @@
             let payload = {
               date: moment().format("L"),
               legalTerms: this.legalDescription,
-              bounty: this.refundAmount + "000000000000000000" + " USDC",
+              bounty: this.refundAmount + "000000" + " USDC",
               protocol: this.refundTitle,
             };
             this.openBounties.push(payload);
@@ -383,7 +383,7 @@
                           legalTerms: bounty[6],
                           date: moment().format("L"),
                           protocol: bounty[5],
-                          bounty: bounty[2].slice(0, -14) + " USDC",
+                          bounty: bounty[2].slice(0, -6) + " USDC",
                           paymentToken: bounty[3],
                         };
                         this.openBounties.push(payload);
