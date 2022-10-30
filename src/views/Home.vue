@@ -288,10 +288,11 @@ import Web3 from "web3";
 export default {
   name: "HomeView",
   data: () => ({
-    unhackedContract: UNHACKEDABI,
-    erc20Contract: ERC20ABI,
+    unhackedabi: JSON.parse(JSON.stringify(UNHACKEDABI.abi)),
+    erc20abi: JSON.parse(JSON.stringify(ERC20ABI.abi)),
     proposalLoading: false,
     proposalDialog: false,
+    spendCondition: false,
     dialog: false,
     selectedBounty: {},
     refundAddress: "",
@@ -304,8 +305,8 @@ export default {
       {
         date: "25/10/22",
         protocol: "Ape Factory DeFi",
-        bounty: "100 ETH",
-        contractAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
+        bounty: 100,
+        contractAddress: "0x25784622b54C7Ca85073FB1eFd89402F7bcB3B4D",
         creatorAddress: "0xACDB303129dD772DCd717bf75b8667A06C00089A",
         id: 1,
         legalTerms:
@@ -444,20 +445,23 @@ export default {
       return provider;
     },
     async settleBounty(bounty) {
-      console.log("bounty object", bounty);
       let provider = this.connectWallet();
       provider;
       let web3 = new Web3(window.ethereum);
       let erc20Address = bounty.contractAddress;
-      let erc20 = new web3.eth.Contract(this.ERC20, erc20Address);
+      console.log("bounty.contractAddress", erc20Address);
+      console.log("this.selectedAccount", this.selectedAccount);
+      let erc20 = new web3.eth.Contract(this.erc20abi, erc20Address);
       let unHacked = new web3.eth.Contract(
-        this.UnhackedInsurance,
+        this.unhackedabi,
         this.unHackedAddress
       );
-
+      console.log("bounty.bountyAmount", bounty.bountyAmount);
+      console.log("this.unHackedAddress", this.unHackedAddress);
+      console.log("this.selectedAccount", this.selectedAccount);
       if (this.spendCondition == false) {
         erc20.methods
-          .approve(this.unHackedAddress, bounty.bountyAmount)
+          .approve(this.unHackedAddress, bounty.bounty)
           .send({ from: this.selectedAccount })
           .then(() => {
             this.spendCondition = true;
