@@ -159,8 +159,12 @@
             <v-row class="justify-center ml-8">
               <v-col class="pt-0">
                 <p class="description">
-                  It's reponsability of the proposal creator to verify the
-                  address before settle the agreement
+                  Bounty proposals can receive multiple applications. It is the
+                  protocol’s duty to do its research and accept which bounty is
+                  legitimate. In the unlikely event that you accept a wrongful
+                  bounty, you are receiving and sending money with actors not
+                  involved in the hack. In this case, the origin of the funds
+                  cannot be guaranteed.
                 </p>
               </v-col>
             </v-row>
